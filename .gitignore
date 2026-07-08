@@ -1,0 +1,10 @@
+node_modules/
+.pnpm-store/
+public/
+dist/
+types/
+temp/
+coverage/
+.DS_Store
+docs/.vitepress/cache/
+docs/.vitepress/dist/

@@ -1,0 +1,16 @@
+node_modules/
+example/
+/DS_Store
+src/
+.idea/
+.gitignore
+.npmignore
+.npmrc
+index.html
+pnpm-lock.yaml
+rollup.config.js
+package-lock.json
+tsconfig.json
+tsconfig.rollup.json
+vite.config.mts
+temp/
