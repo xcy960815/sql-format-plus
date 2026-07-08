@@ -121,9 +121,9 @@ pnpm run docs:dev
 
 ## Project Structure
 
-- `src/index.ts`: library entry
-- `src/core`: tokenizer, formatter, indentation, inline-block, and params logic
-- `src/languages`: dialect-specific formatter configuration
+- `src/sql-format-plus/index.ts`: library entry
+- `src/sql-format-plus/core`: tokenizer, formatter, indentation, inline-block, and params logic
+- `src/sql-format-plus/languages`: dialect-specific formatter configuration
 - `src/main.ts`: local demo entry
 - `rollup.config.js`: Rollup build for library bundles and bundled declarations
 - `vite.config.mts`: Vite config for the demo app

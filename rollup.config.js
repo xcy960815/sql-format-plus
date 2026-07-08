@@ -6,7 +6,7 @@ const typescript = require('@rollup/plugin-typescript')
 const { dts } = require('rollup-plugin-dts')
 const terser = require('@rollup/plugin-terser')
 
-const input = path.resolve(__dirname, 'src/index.ts')
+const input = path.resolve(__dirname, 'src/sql-format-plus/index.ts')
 const distDir = path.resolve(__dirname, 'dist')
 const typesDir = path.resolve(__dirname, 'types')
 

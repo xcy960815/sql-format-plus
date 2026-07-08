@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SQL Formatter</title>
+    <title>SQL Format Plus</title>
     <style>
       :root {
         color: #1d2433;
@@ -63,7 +63,7 @@
       }
 
       select {
-        min-width: 120px;
+        min-width: 132px;
         padding: 8px 10px;
         border: 1px solid #c8d1dd;
         border-radius: 6px;
@@ -71,10 +71,31 @@
         color: #1d2433;
       }
 
+      #sql-example {
+        min-width: 220px;
+      }
+
       .workspace {
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
         min-height: 0;
+      }
+
+      .pane {
+        display: grid;
+        grid-template-rows: auto 1fr;
+        min-width: 0;
+        min-height: 0;
+      }
+
+      .pane-title {
+        padding: 10px 20px;
+        border-bottom: 1px solid #d9e0ea;
+        background: #edf2f7;
+        color: #526070;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
       }
 
       textarea,
@@ -96,8 +117,11 @@
 
       textarea {
         resize: none;
-        border-right: 1px solid #d9e0ea;
         background: #ffffff;
+      }
+
+      .pane:first-child {
+        border-right: 1px solid #d9e0ea;
       }
 
       pre {
@@ -116,7 +140,7 @@
           grid-template-columns: 1fr;
         }
 
-        textarea {
+        .pane:first-child {
           border-right: 0;
           border-bottom: 1px solid #d9e0ea;
         }
@@ -126,8 +150,19 @@
   <body>
     <main>
       <header>
-        <h1>SQL Formatter</h1>
+        <h1>SQL Format Plus</h1>
         <div class="controls">
+          <label>
+            Example
+            <select id="sql-example">
+              <option value="0">Basic filtering</option>
+              <option value="1">JOIN with aggregation</option>
+              <option value="2">CTE and window function</option>
+              <option value="3">N1QL nested data</option>
+              <option value="4">DB2 pagination</option>
+              <option value="5">PL/SQL block</option>
+            </select>
+          </label>
           <label>
             Language
             <select id="sql-language">
@@ -148,9 +183,14 @@
         </div>
       </header>
       <section class="workspace">
-        <textarea id="sql-input" spellcheck="false">
-SELECT supplier_name, city FROM suppliers WHERE supplier_id > 500 ORDER BY supplier_name ASC, city DESC;</textarea>
-        <pre id="sql-output"></pre>
+        <section class="pane" aria-label="SQL input">
+          <div class="pane-title">Input</div>
+          <textarea id="sql-input" spellcheck="false"></textarea>
+        </section>
+        <section class="pane" aria-label="Formatted SQL output">
+          <div class="pane-title">Formatted</div>
+          <pre id="sql-output"></pre>
+        </section>
       </section>
     </main>
     <script type="module" src="/src/main.ts"></script>

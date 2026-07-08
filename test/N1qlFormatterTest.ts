@@ -1,4 +1,4 @@
-import sqlFormatter from './../src/sqlFormatter'
+import sqlFormatter from './../src/sql-format-plus/sqlFormatter'
 import behavesLikeSqlFormatter from './behavesLikeSqlFormatter'
 
 import assert from 'assert'

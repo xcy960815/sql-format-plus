@@ -18,7 +18,6 @@ export default [
       'types/**',
       'temp/**',
       '.husky/**',
-      'test/**',
     ],
   },
   {

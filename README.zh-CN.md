@@ -121,9 +121,9 @@ pnpm run docs:dev
 
 ## 项目结构
 
-- `src/index.ts`：库入口
-- `src/core`：分词、格式化、缩进、内联块和参数替换逻辑
-- `src/languages`：不同 SQL 方言的 formatter 配置
+- `src/sql-format-plus/index.ts`：库入口
+- `src/sql-format-plus/core`：分词、格式化、缩进、内联块和参数替换逻辑
+- `src/sql-format-plus/languages`：不同 SQL 方言的 formatter 配置
 - `src/main.ts`：本地 demo 入口
 - `rollup.config.js`：库构建和类型打包配置
 - `vite.config.mts`：demo 开发配置

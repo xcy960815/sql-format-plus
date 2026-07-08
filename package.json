@@ -22,7 +22,7 @@
   "scripts": {
     "dev": "vite",
     "build": "rollup -c",
-    "check": "tsc --noEmit",
+    "check": "tsc --noEmit && tsc -p tsconfig.test.json",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
