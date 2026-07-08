@@ -3,7 +3,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: 'sql-format-plus',
   description: 'A lightweight JavaScript and TypeScript SQL formatter.',
-  base: '/sql-formatter-plus/',
+  base: '/sql-format-plus/',
   cleanUrls: true,
   head: [['meta', { name: 'theme-color', content: '#2f6fed' }]],
   locales: {
