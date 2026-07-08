@@ -19,11 +19,18 @@ Important files:
 Use these commands from the repository root:
 
 ```bash
+pnpm test
 pnpm run check
 pnpm run lint
 pnpm run format:check
 pnpm run build
 pnpm run docs:build
+```
+
+`pnpm test` runs the existing formatter tests with Vitest:
+
+```bash
+vitest run
 ```
 
 `pnpm run check` type-checks both source and test files:
@@ -32,19 +39,13 @@ pnpm run docs:build
 tsc --noEmit && tsc -p tsconfig.test.json
 ```
 
-## Important Limitation
-
-There is currently no `test` script in `package.json`, and the current
-development dependencies do not expose an obvious runtime test runner script.
-Do not claim runtime tests were executed unless a runner is added or invoked
-explicitly.
-
 For behavior changes, at minimum:
 
 1. Add or update cases in the relevant `test/*FormatterTest.ts` file.
-2. Run `pnpm run check`.
-3. Run `pnpm run lint` when touching source or tests.
-4. Run `pnpm run build` before validating package output.
+2. Run `pnpm test`.
+3. Run `pnpm run check`.
+4. Run `pnpm run lint` when touching source or tests.
+5. Run `pnpm run build` before validating package output.
 
 ## Adding Or Changing Formatter Behavior
 
@@ -65,10 +66,3 @@ When adding coverage:
 - Include tricky placeholder, comment, string, parenthesis, and reserved-word
   cases when changing tokenizer rules.
 - Preserve exact whitespace in expected strings; whitespace is the product.
-
-## Suggested Future Improvement
-
-If runtime testing is needed, add an explicit test runner and script in a
-separate change. Good candidates are a lightweight Mocha setup, Node's built-in
-test runner with migrated tests, or Vitest with configured globals. After that,
-update this file and `AGENTS.md` with the new command.

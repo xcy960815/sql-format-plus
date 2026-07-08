@@ -1,15 +1,7 @@
-# Demo
+# Online Demo
 
-Run the local Vite demo:
+Use the playground below to format SQL examples with different dialects and indentation settings.
 
-```bash
-pnpm run dev
-```
-
-The demo reads from `src/main.ts` and formats queries directly against the TypeScript source entry.
-
-For the documentation site:
-
-```bash
-pnpm run docs:dev
-```
+<div class="demo-doc-block">
+  <SqlFormatDemo />
+</div>

@@ -2,7 +2,8 @@
 
 [中文文档](./README.zh-CN.md)
 
-- Documentation: [docs](./docs)
+- Documentation: [https://xcy960815.github.io/sql-format-plus/](https://xcy960815.github.io/sql-format-plus/)
+- Online Demo: [https://xcy960815.github.io/sql-format-plus/guide/demo](https://xcy960815.github.io/sql-format-plus/guide/demo)
 
 `sql-format-plus` is a lightweight JavaScript and TypeScript library for pretty-printing SQL queries.
 
@@ -116,7 +117,6 @@ pnpm install
 pnpm run dev
 pnpm run check
 pnpm run build
-pnpm run docs:dev
 ```
 
 ## Project Structure

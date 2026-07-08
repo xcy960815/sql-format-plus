@@ -1,15 +1,7 @@
-# 演示
+# 在线演示
 
-运行本地 Vite demo：
+你可以在下面的演示区中选择不同 SQL 方言和缩进设置，直接查看格式化效果。
 
-```bash
-pnpm run dev
-```
-
-这个 demo 会直接引用 TypeScript 源码入口 `src/main.ts`，方便本地开发时验证格式化效果。
-
-运行文档站：
-
-```bash
-pnpm run docs:dev
-```
+<div class="demo-doc-block">
+  <SqlFormatDemo />
+</div>

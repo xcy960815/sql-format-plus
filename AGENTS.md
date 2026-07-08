@@ -56,6 +56,7 @@ Supported dialects:
 
 ```bash
 pnpm install
+pnpm test
 pnpm run check
 pnpm run lint
 pnpm run build
@@ -63,9 +64,6 @@ pnpm run docs:build
 pnpm run dev
 pnpm run docs:dev
 ```
-
-There is currently no dedicated `test` script in `package.json`. See
-`.agents/testing.md` before assuming a runtime test command exists.
 
 ## Important Constraints
 

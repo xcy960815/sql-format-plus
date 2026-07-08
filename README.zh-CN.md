@@ -2,7 +2,8 @@
 
 [English README](./README.md)
 
-- 文档地址：[docs](./docs)
+- 文档地址：[https://xcy960815.github.io/sql-format-plus/](https://xcy960815.github.io/sql-format-plus/)
+- 在线演示：[https://xcy960815.github.io/sql-format-plus/zh-CN/guide/demo](https://xcy960815.github.io/sql-format-plus/zh-CN/guide/demo)
 
 `sql-format-plus` 是一个轻量级 JavaScript 和 TypeScript SQL 格式化库。
 
@@ -116,7 +117,6 @@ pnpm install
 pnpm run dev
 pnpm run check
 pnpm run build
-pnpm run docs:dev
 ```
 
 ## 项目结构
