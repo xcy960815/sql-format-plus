@@ -225,18 +225,26 @@ const reservedNewlineWords = [
 
 let tokenizer: Tokenizer | undefined
 
+/**
+ * Couchbase N1QL 方言格式化器。
+ */
 export default class N1qlFormatter {
   private readonly cfg: FormatOptions
 
+  /**
+   * 初始化 N1qlFormatter。
+   *
+   * @param {FormatOptions} cfg 格式化配置。
+   */
   constructor(cfg: FormatOptions) {
     this.cfg = cfg
   }
 
   /**
-   * Format the whitespace in a N1QL string to make it easier to read
+   * 格式化 N1QL 字符串中的空白以提高可读性。
    *
-   * @param {String} query The N1QL string
-   * @return {String} formatted string
+   * @param {string} query 原始 N1QL 查询字符串。
+   * @returns {string} 格式化后的查询。
    */
   format(query: string): string {
     if (!tokenizer) {

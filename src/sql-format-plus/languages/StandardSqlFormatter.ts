@@ -326,18 +326,26 @@ const reservedNewlineWords = [
 
 let tokenizer: Tokenizer | undefined
 
+/**
+ * 标准 SQL 方言格式化器。
+ */
 export default class StandardSqlFormatter {
   private readonly cfg: FormatOptions
 
+  /**
+   * 初始化 StandardSqlFormatter。
+   *
+   * @param {FormatOptions} cfg 格式化配置。
+   */
   constructor(cfg: FormatOptions) {
     this.cfg = cfg
   }
 
   /**
-   * Format the whitespace in a Standard SQL string to make it easier to read
+   * 格式化标准 SQL 字符串中的空白以提高可读性。
    *
-   * @param {String} query The Standard SQL string
-   * @return {String} formatted string
+   * @param {string} query 原始标准 SQL 查询字符串。
+   * @returns {string} 格式化后的查询。
    */
   format(query: string): string {
     if (!tokenizer) {

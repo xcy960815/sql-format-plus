@@ -548,18 +548,26 @@ const reservedNewlineWords = [
 
 let tokenizer: Tokenizer | undefined
 
+/**
+ * IBM DB2 SQL 方言格式化器。
+ */
 export default class Db2Formatter {
   private readonly cfg: FormatOptions
 
+  /**
+   * 初始化 Db2Formatter。
+   *
+   * @param {FormatOptions} cfg 格式化配置。
+   */
   constructor(cfg: FormatOptions) {
     this.cfg = cfg
   }
 
   /**
-   * Formats DB2 query to make it easier to read
+   * 格式化 DB2 查询字符串以提高可读性。
    *
-   * @param {String} query The DB2 query string
-   * @return {String} formatted string
+   * @param {string} query 原始 DB2 查询字符串。
+   * @returns {string} 格式化后的查询。
    */
   format(query: string): string {
     if (!tokenizer) {
