@@ -2,7 +2,8 @@
   "name": "sql-format-plus",
   "version": "0.0.1",
   "description": "Formats whitespaces in a SQL query to make it more readable.",
-  "main": "dist/sql-format-plus.umd.js",
+  "type": "module",
+  "main": "dist/sql-format-plus.es.js",
   "module": "dist/sql-format-plus.es.js",
   "typings": "./types/sql-format-plus.d.ts",
   "files": [
@@ -16,12 +17,12 @@
     ".": {
       "types": "./types/sql-format-plus.d.ts",
       "import": "./dist/sql-format-plus.es.js",
-      "default": "./dist/sql-format-plus.umd.js"
+      "default": "./dist/sql-format-plus.es.js"
     }
   },
   "scripts": {
     "dev": "vite",
-    "build": "rollup -c",
+    "build": "rollup -c rollup.config.cjs",
     "check": "tsc --noEmit && tsc -p tsconfig.test.json",
     "test": "vitest run",
     "docs:dev": "vitepress dev docs",

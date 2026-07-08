@@ -125,7 +125,7 @@ pnpm run build
 - `src/sql-format-plus/core`: tokenizer, formatter, indentation, inline-block, and params logic
 - `src/sql-format-plus/languages`: dialect-specific formatter configuration
 - `src/main.ts`: local demo entry
-- `rollup.config.js`: Rollup build for library bundles and bundled declarations
+- `rollup.config.cjs`: Rollup build for library bundles and bundled declarations
 - `vite.config.mts`: Vite config for the demo app
 - `docs`: VitePress documentation
 
