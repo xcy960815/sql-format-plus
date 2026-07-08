@@ -363,7 +363,6 @@ const reservedToplevelWords = [
   'DECLARE',
   'DELETE FROM',
   'DELETE',
-  'END',
   'EXCEPT',
   'EXCEPTION',
   'FETCH FIRST',
@@ -394,7 +393,6 @@ const reservedNewlineWords = [
   'CROSS APPLY',
   'CROSS JOIN',
   'ELSE',
-  'END',
   'INNER JOIN',
   'JOIN',
   'LEFT JOIN',
@@ -410,18 +408,26 @@ const reservedNewlineWords = [
 
 let tokenizer: Tokenizer | undefined
 
+/**
+ * Oracle PL/SQL 方言格式化器。
+ */
 export default class PlSqlFormatter {
   private readonly cfg: FormatOptions
 
+  /**
+   * 初始化 PlSqlFormatter。
+   *
+   * @param {FormatOptions} cfg 格式化配置。
+   */
   constructor(cfg: FormatOptions) {
     this.cfg = cfg
   }
 
   /**
-   * Format the whitespace in a PL/SQL string to make it easier to read
+   * 格式化 PL/SQL 字符串中的空白以提高可读性。
    *
-   * @param {String} query The PL/SQL string
-   * @return {String} formatted string
+   * @param {string} query 原始 PL/SQL 查询字符串。
+   * @returns {string} 格式化后的查询。
    */
   format(query: string): string {
     if (!tokenizer) {
@@ -431,7 +437,9 @@ export default class PlSqlFormatter {
         reservedNewlineWords,
         stringTypes: [`""`, "N''", "''", '``'],
         openParens: ['(', 'CASE'],
-        closeParens: [')', 'END'],
+        closeParens: [')'],
+        keywordBlockStarts: ['BEGIN', 'LOOP'],
+        keywordBlockEnds: ['END'],
         indexedPlaceholderTypes: ['?'],
         namedPlaceholderTypes: [':'],
         lineCommentTypes: ['--'],

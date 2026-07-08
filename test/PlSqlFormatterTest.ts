@@ -82,6 +82,62 @@ describe('PlSqlFormatter', function () {
     )
   })
 
+  it('formats assignment operators as a single operator', function () {
+    const result = sqlFormatter.format('BEGIN a:=1; END;', {
+      language: 'pl/sql',
+    })
+
+    assert.equal(result, 'BEGIN\n' + '  a := 1;\n' + 'END;')
+  })
+
+  it('formats nested BEGIN blocks without flattening indentation', function () {
+    const result = sqlFormatter.format('BEGIN BEGIN a:=1; END; b:=2; END;', {
+      language: 'pl/sql',
+    })
+
+    assert.equal(
+      result,
+      'BEGIN\n' +
+        '  BEGIN\n' +
+        '    a := 1;\n' +
+        '  END;\n' +
+        '  b := 2;\n' +
+        'END;',
+    )
+  })
+
+  it('formats LOOP blocks without joining following statements', function () {
+    const result = sqlFormatter.format(
+      "BEGIN FOR item IN (SELECT id, status FROM orders WHERE status = 'PENDING') LOOP UPDATE orders SET status = 'PROCESSING', updated_at = SYSDATE WHERE id = item.id; END LOOP; COMMIT; END;",
+      { language: 'pl/sql' },
+    )
+
+    assert.equal(
+      result,
+      'BEGIN\n' +
+        '  FOR item IN (\n' +
+        '    SELECT\n' +
+        '      id,\n' +
+        '      status\n' +
+        '    FROM\n' +
+        '      orders\n' +
+        '    WHERE\n' +
+        "      status = 'PENDING'\n" +
+        '  )\n' +
+        '  LOOP\n' +
+        '    UPDATE\n' +
+        '      orders\n' +
+        '    SET\n' +
+        "      status = 'PROCESSING',\n" +
+        '      updated_at = SYSDATE\n' +
+        '    WHERE\n' +
+        '      id = item.id;\n' +
+        '  END LOOP;\n' +
+        '  COMMIT;\n' +
+        'END;',
+    )
+  })
+
   it('formats ALTER TABLE ... MODIFY query', function () {
     const result = sqlFormatter.format(
       'ALTER TABLE supplier MODIFY supplier_name char(100) NOT NULL;',

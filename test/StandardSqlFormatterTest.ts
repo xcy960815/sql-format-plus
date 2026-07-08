@@ -40,6 +40,12 @@ describe('StandardSqlFormatter', function () {
     )
   })
 
+  it('formats subtraction operators separately from negative numbers', function () {
+    const result = sqlFormatter.format('SELECT a-3-4 FROM t')
+
+    assert.equal(result, 'SELECT\n' + '  a - 3 - 4\n' + 'FROM\n' + '  t')
+  })
+
   it('formats ALTER TABLE ... MODIFY query', function () {
     const result = sqlFormatter.format(
       'ALTER TABLE supplier MODIFY supplier_name char(100) NOT NULL;',

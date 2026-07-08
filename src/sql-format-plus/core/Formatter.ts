@@ -6,7 +6,41 @@ import type Tokenizer from './Tokenizer'
 import type { Token } from './Tokenizer'
 import tokenTypes from './tokenTypes'
 
-const trimEnd = (value: string): string => value.replace(/\s+$/, '')
+class OutputBuffer {
+  private readonly chunks: string[] = []
+
+  append(value: string): void {
+    if (value) {
+      this.chunks.push(value)
+    }
+  }
+
+  trimEnd(): void {
+    while (this.chunks.length > 0) {
+      const lastIndex = this.chunks.length - 1
+      const chunk = this.chunks[lastIndex]
+      const trimmed = chunk.replace(/\s+$/, '')
+
+      if (trimmed.length === chunk.length) {
+        return
+      }
+      if (trimmed.length > 0) {
+        this.chunks[lastIndex] = trimmed
+        return
+      }
+      this.chunks.pop()
+    }
+  }
+
+  addNewline(indent: string): void {
+    this.trimEnd()
+    this.append(`\n${indent}`)
+  }
+
+  toString(): string {
+    return this.chunks.join('')
+  }
+}
 
 export default class Formatter {
   private readonly cfg: FormatOptions
@@ -20,6 +54,8 @@ export default class Formatter {
   private readonly tokenizer: Tokenizer
 
   private previousReservedWord: Partial<Token> = {}
+
+  private keywordBlockEndPending = false
 
   constructor(cfg: FormatOptions, tokenizer: Tokenizer) {
     this.cfg = cfg || {}
@@ -37,75 +73,107 @@ export default class Formatter {
   }
 
   private getFormattedQueryFromTokens(tokens: Token[]): string {
-    let formattedQuery = ''
+    const query = new OutputBuffer()
 
     tokens.forEach((token, index) => {
       if (token.type === tokenTypes.WHITESPACE) {
         return
       }
       if (token.type === tokenTypes.LINE_COMMENT) {
-        formattedQuery = this.formatLineComment(token, formattedQuery)
+        this.formatLineComment(token, query)
       } else if (token.type === tokenTypes.BLOCK_COMMENT) {
-        formattedQuery = this.formatBlockComment(token, formattedQuery)
+        this.formatBlockComment(token, query)
+      } else if (token.type === tokenTypes.RESERVED_KEYWORD_BLOCK_START) {
+        this.formatKeywordBlockStart(token, query)
+        this.previousReservedWord = token
+      } else if (token.type === tokenTypes.RESERVED_KEYWORD_BLOCK_END) {
+        this.formatKeywordBlockEnd(token, query)
+        this.previousReservedWord = token
       } else if (token.type === tokenTypes.RESERVED_TOPLEVEL) {
-        formattedQuery = this.formatToplevelReservedWord(token, formattedQuery)
+        this.formatToplevelReservedWord(token, query)
         this.previousReservedWord = token
       } else if (token.type === tokenTypes.RESERVED_NEWLINE) {
-        formattedQuery = this.formatNewlineReservedWord(token, formattedQuery)
+        this.formatNewlineReservedWord(token, query)
         this.previousReservedWord = token
       } else if (token.type === tokenTypes.RESERVED) {
-        formattedQuery = this.formatWithSpaces(token, formattedQuery)
+        this.formatWithSpaces(token, query)
         this.previousReservedWord = token
       } else if (token.type === tokenTypes.OPEN_PAREN) {
-        formattedQuery = this.formatOpeningParentheses(
-          tokens,
-          index,
-          formattedQuery,
-        )
+        this.formatOpeningParentheses(tokens, index, query)
       } else if (token.type === tokenTypes.CLOSE_PAREN) {
-        formattedQuery = this.formatClosingParentheses(token, formattedQuery)
+        this.formatClosingParentheses(token, query)
       } else if (token.type === tokenTypes.PLACEHOLDER) {
-        formattedQuery = this.formatPlaceholder(token, formattedQuery)
+        this.formatPlaceholder(token, query)
       } else if (token.value === ',') {
-        formattedQuery = this.formatComma(token, formattedQuery)
+        this.formatComma(token, query)
       } else if (token.value === ':') {
-        formattedQuery = this.formatWithSpaceAfter(token, formattedQuery)
-      } else if (token.value === '.' || token.value === ';') {
-        formattedQuery = this.formatWithoutSpaces(token, formattedQuery)
+        this.formatWithSpaceAfter(token, query)
+      } else if (token.value === ';') {
+        this.formatSemicolon(token, query)
+      } else if (token.value === '.') {
+        this.formatWithoutSpaces(token, query)
       } else {
-        formattedQuery = this.formatWithSpaces(token, formattedQuery)
+        this.formatWithSpaces(token, query)
       }
     })
-    return formattedQuery
+    return query.toString()
   }
 
-  private formatLineComment(token: Token, query: string): string {
-    return this.addNewline(query + token.value)
+  private formatLineComment(token: Token, query: OutputBuffer): void {
+    query.append(token.value)
+    this.addNewline(query)
   }
 
-  private formatBlockComment(token: Token, query: string): string {
-    return this.addNewline(
-      this.addNewline(query) + this.indentComment(token.value),
-    )
+  private formatBlockComment(token: Token, query: OutputBuffer): void {
+    this.addNewline(query)
+    query.append(this.indentComment(token.value))
+    this.addNewline(query)
   }
 
   private indentComment(comment: string): string {
     return comment.replace(/\n/g, `\n${this.indentation.getIndent()}`)
   }
 
-  private formatToplevelReservedWord(token: Token, query: string): string {
+  private formatKeywordBlockStart(token: Token, query: OutputBuffer): void {
+    if (
+      /^LOOP$/i.test(token.value) &&
+      /^END$/i.test(this.previousReservedWord.value || '')
+    ) {
+      this.formatWithSpaces(token, query)
+      this.keywordBlockEndPending = true
+      return
+    }
+
     this.indentation.decreaseTopLevel()
-
-    query = this.addNewline(query)
-
-    this.indentation.increaseToplevel()
-
-    query += this.equalizeWhitespace(token.value)
-    return this.addNewline(query)
+    this.addNewline(query)
+    this.indentation.increaseKeywordBlock()
+    query.append(this.equalizeWhitespace(token.value))
+    this.addNewline(query)
   }
 
-  private formatNewlineReservedWord(token: Token, query: string): string {
-    return `${this.addNewline(query)}${this.equalizeWhitespace(token.value)} `
+  private formatKeywordBlockEnd(token: Token, query: OutputBuffer): void {
+    if (this.inlineBlock.isActive() || this.indentation.isBlockLevel()) {
+      this.formatClosingParentheses(token, query)
+      return
+    }
+
+    this.indentation.decreaseKeywordBlock()
+    this.addNewline(query)
+    query.append(`${this.equalizeWhitespace(token.value)} `)
+    this.keywordBlockEndPending = true
+  }
+
+  private formatToplevelReservedWord(token: Token, query: OutputBuffer): void {
+    this.indentation.decreaseTopLevel()
+    this.addNewline(query)
+    this.indentation.increaseToplevel()
+    query.append(this.equalizeWhitespace(token.value))
+    this.addNewline(query)
+  }
+
+  private formatNewlineReservedWord(token: Token, query: OutputBuffer): void {
+    this.addNewline(query)
+    query.append(`${this.equalizeWhitespace(token.value)} `)
   }
 
   private equalizeWhitespace(value: string): string {
@@ -115,66 +183,79 @@ export default class Formatter {
   private formatOpeningParentheses(
     tokens: Token[],
     index: number,
-    query: string,
-  ): string {
+    query: OutputBuffer,
+  ): void {
     const previousToken = tokens[index - 1]
     if (
       previousToken &&
       previousToken.type !== tokenTypes.WHITESPACE &&
       previousToken.type !== tokenTypes.OPEN_PAREN
     ) {
-      query = trimEnd(query)
+      query.trimEnd()
     }
-    query += tokens[index].value
+    query.append(tokens[index].value)
 
     this.inlineBlock.beginIfPossible(tokens, index)
 
     if (!this.inlineBlock.isActive()) {
       this.indentation.increaseBlockLevel()
-      query = this.addNewline(query)
+      this.addNewline(query)
     }
-    return query
   }
 
-  private formatClosingParentheses(token: Token, query: string): string {
+  private formatClosingParentheses(token: Token, query: OutputBuffer): void {
     if (this.inlineBlock.isActive()) {
       this.inlineBlock.end()
-      return this.formatWithSpaceAfter(token, query)
+      this.formatWithSpaceAfter(token, query)
+      return
     }
 
     this.indentation.decreaseBlockLevel()
-    return this.formatWithSpaces(token, this.addNewline(query))
+    this.addNewline(query)
+    this.formatWithSpaces(token, query)
   }
 
-  private formatPlaceholder(token: Token, query: string): string {
-    return `${query}${this.params.get(token)} `
+  private formatPlaceholder(token: Token, query: OutputBuffer): void {
+    query.append(`${this.params.get(token)} `)
   }
 
-  private formatComma(token: Token, query: string): string {
-    query = `${trimEnd(query)}${token.value} `
+  private formatComma(token: Token, query: OutputBuffer): void {
+    query.trimEnd()
+    query.append(`${token.value} `)
 
     if (this.inlineBlock.isActive()) {
-      return query
+      return
     }
     if (/^LIMIT$/i.test(this.previousReservedWord.value || '')) {
-      return query
+      return
     }
-    return this.addNewline(query)
+    this.addNewline(query)
   }
 
-  private formatWithSpaceAfter(token: Token, query: string): string {
-    return `${trimEnd(query)}${token.value} `
+  private formatWithSpaceAfter(token: Token, query: OutputBuffer): void {
+    query.trimEnd()
+    query.append(`${token.value} `)
   }
 
-  private formatWithoutSpaces(token: Token, query: string): string {
-    return trimEnd(query) + token.value
+  private formatWithoutSpaces(token: Token, query: OutputBuffer): void {
+    query.trimEnd()
+    query.append(token.value)
   }
 
-  private formatWithSpaces(token: Token, query: string): string {
-    return `${query}${token.value} `
+  private formatSemicolon(token: Token, query: OutputBuffer): void {
+    this.formatWithoutSpaces(token, query)
+
+    if (this.keywordBlockEndPending) {
+      this.addNewline(query)
+      this.keywordBlockEndPending = false
+    }
   }
 
-  private addNewline(query: string): string {
-    return `${trimEnd(query)}\n${this.indentation.getIndent()}`
+  private formatWithSpaces(token: Token, query: OutputBuffer): void {
+    query.append(`${token.value} `)
+  }
+
+  private addNewline(query: OutputBuffer): void {
+    query.addNewline(this.indentation.getIndent())
   }
 }

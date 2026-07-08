@@ -52,6 +52,19 @@ const language = document.querySelector<HTMLSelectElement>('#sql-language')
 const indent = document.querySelector<HTMLSelectElement>('#sql-indent')
 const example = document.querySelector<HTMLSelectElement>('#sql-example')
 
+const MAX_SYNC_INPUT_LENGTH = 50000
+
+const debounce = (fn: () => void, delay: number): (() => void) => {
+  let timer: ReturnType<typeof setTimeout> | undefined
+
+  return () => {
+    if (timer) {
+      clearTimeout(timer)
+    }
+    timer = setTimeout(fn, delay)
+  }
+}
+
 const syncExample = (selectedExample: QueryExample): void => {
   if (!input || !language) {
     return
@@ -66,13 +79,21 @@ const render = (): void => {
     return
   }
 
+  if (input.value.length > MAX_SYNC_INPUT_LENGTH) {
+    output.textContent =
+      'Input is too large for live formatting. Shorten the SQL or format it through the library API.'
+    return
+  }
+
   output.textContent = sqlFormatter.format(input.value, {
     language: language.value as SqlDialect,
     indent: indent.value,
   })
 }
 
-input?.addEventListener('input', render)
+const debouncedRender = debounce(render, 200)
+
+input?.addEventListener('input', debouncedRender)
 language?.addEventListener('change', render)
 indent?.addEventListener('change', render)
 example?.addEventListener('change', () => {

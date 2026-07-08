@@ -14,27 +14,35 @@ export interface TokenizerConfig {
   stringTypes: StringType[]
   openParens: string[]
   closeParens: string[]
+  keywordBlockStarts?: string[]
+  keywordBlockEnds?: string[]
   indexedPlaceholderTypes?: string[]
   namedPlaceholderTypes?: string[]
   lineCommentTypes: string[]
   specialWordChars?: string[]
 }
 
-type PlaceholderRegex = RegExp | false
+type OptionalRegex = RegExp | false
+type PlaceholderRegex = OptionalRegex
 
 const escapeRegExp = (value: string): string =>
   value.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
 
 export default class Tokenizer {
-  private readonly WHITESPACE_REGEX = /^(\s+)/
+  private readonly WHITESPACE_REGEX = /(\s+)/y
 
   private readonly NUMBER_REGEX =
-    /^((-\s*)?[0-9]+(\.[0-9]+)?|0x[0-9a-fA-F]+|0b[01]+)\b/
+    /([0-9]+(\.[0-9]+)?|0x[0-9a-fA-F]+|0b[01]+)\b/y
+
+  private readonly SIGNED_NUMBER_REGEX =
+    /(-\s*(?:[0-9]+(\.[0-9]+)?|0x[0-9a-fA-F]+|0b[01]+)\b)/y
+
+  private readonly ASSIGNMENT_REGEX = /(:=)/y
 
   private readonly OPERATOR_REGEX =
-    /^(!=|<>|==|<=|>=|!<|!>|\|\||::|->>|->|~~\*|~~|!~~\*|!~~|~\*|!~\*|!~|.)/
+    /(!=|<>|==|<=|>=|!<|!>|\|\||::|->>|->|~~\*|~~|!~~\*|!~~|~\*|!~\*|!~|.)/y
 
-  private readonly BLOCK_COMMENT_REGEX = /^(\/\*[^]*?(?:\*\/|$))/
+  private readonly BLOCK_COMMENT_REGEX = /(\/\*[^]*?(?:\*\/|$))/y
 
   private readonly LINE_COMMENT_REGEX: RegExp
 
@@ -43,6 +51,10 @@ export default class Tokenizer {
   private readonly RESERVED_NEWLINE_REGEX: RegExp
 
   private readonly RESERVED_PLAIN_REGEX: RegExp
+
+  private readonly KEYWORD_BLOCK_START_REGEX: OptionalRegex
+
+  private readonly KEYWORD_BLOCK_END_REGEX: OptionalRegex
 
   private readonly WORD_REGEX: RegExp
 
@@ -68,6 +80,12 @@ export default class Tokenizer {
       cfg.reservedNewlineWords,
     )
     this.RESERVED_PLAIN_REGEX = this.createReservedWordRegex(cfg.reservedWords)
+    this.KEYWORD_BLOCK_START_REGEX = this.createOptionalReservedWordRegex(
+      cfg.keywordBlockStarts,
+    )
+    this.KEYWORD_BLOCK_END_REGEX = this.createOptionalReservedWordRegex(
+      cfg.keywordBlockEnds,
+    )
 
     this.WORD_REGEX = this.createWordRegex(cfg.specialWordChars)
     this.STRING_REGEX = this.createStringRegex(cfg.stringTypes)
@@ -91,38 +109,51 @@ export default class Tokenizer {
 
   tokenize(input: string): Token[] {
     const tokens: Token[] = []
-    let token: Token
-    let previousToken: Token | undefined
+    let previousSignificantToken: Token | undefined
+    let index = 0
 
-    while (input.length) {
-      token = this.getNextToken(input, previousToken)
-      input = input.substring(token.value.length)
+    while (index < input.length) {
+      const token = this.getNextToken(input, index, previousSignificantToken)
+      index += token.value.length
 
       tokens.push(token)
-      previousToken = token
+      if (token.type !== tokenTypes.WHITESPACE) {
+        previousSignificantToken = token
+      }
     }
     return tokens
   }
 
   private createLineCommentRegex(lineCommentTypes: string[]): RegExp {
     return new RegExp(
-      `^((?:${lineCommentTypes.map((c) => escapeRegExp(c)).join('|')}).*?(?:\n|$))`,
+      `((?:${lineCommentTypes.map((c) => escapeRegExp(c)).join('|')}).*?(?:\n|$))`,
+      'y',
     )
   }
 
   private createReservedWordRegex(reservedWords: string[]): RegExp {
     const reservedWordsPattern = reservedWords.join('|').replace(/ /g, '\\s+')
-    return new RegExp(`^(${reservedWordsPattern})\\b`, 'i')
+    return new RegExp(`(${reservedWordsPattern})\\b`, 'iy')
+  }
+
+  private createOptionalReservedWordRegex(
+    reservedWords: string[] | undefined,
+  ): OptionalRegex {
+    if (!reservedWords || reservedWords.length === 0) {
+      return false
+    }
+    return this.createReservedWordRegex(reservedWords)
   }
 
   private createWordRegex(specialChars: string[] = []): RegExp {
     return new RegExp(
-      `^([\\w${specialChars.map((c) => escapeRegExp(c)).join('')}]+)`,
+      `([\\w${specialChars.map((c) => escapeRegExp(c)).join('')}]+)`,
+      'y',
     )
   }
 
   private createStringRegex(stringTypes: StringType[]): RegExp {
-    return new RegExp(`^(${this.createStringPattern(stringTypes)})`)
+    return new RegExp(`(${this.createStringPattern(stringTypes)})`, 'y')
   }
 
   private createStringPattern(stringTypes: StringType[]): string {
@@ -139,8 +170,8 @@ export default class Tokenizer {
 
   private createParenRegex(parens: string[]): RegExp {
     return new RegExp(
-      `^(${parens.map((p) => this.escapeParen(p)).join('|')})`,
-      'i',
+      `(${parens.map((p) => this.escapeParen(p)).join('|')})`,
+      'iy',
     )
   }
 
@@ -160,95 +191,130 @@ export default class Tokenizer {
     }
     const typesRegex = types.map((type) => escapeRegExp(type)).join('|')
 
-    return new RegExp(`^((?:${typesRegex})(?:${pattern}))`)
+    return new RegExp(`((?:${typesRegex})(?:${pattern}))`, 'y')
   }
 
-  private getNextToken(input: string, previousToken?: Token): Token {
+  private getNextToken(
+    input: string,
+    index: number,
+    previousToken?: Token,
+  ): Token {
     return (
-      this.getWhitespaceToken(input) ||
-      this.getCommentToken(input) ||
-      this.getStringToken(input) ||
-      this.getOpenParenToken(input) ||
-      this.getCloseParenToken(input) ||
-      this.getPlaceholderToken(input) ||
-      this.getNumberToken(input) ||
-      this.getReservedWordToken(input, previousToken) ||
-      this.getWordToken(input) ||
-      this.getOperatorToken(input)
+      this.getWhitespaceToken(input, index) ||
+      this.getCommentToken(input, index) ||
+      this.getStringToken(input, index) ||
+      this.getOpenParenToken(input, index) ||
+      this.getCloseParenToken(input, index) ||
+      this.getAssignmentToken(input, index) ||
+      this.getPlaceholderToken(input, index) ||
+      this.getNumberToken(input, index, previousToken) ||
+      this.getKeywordBlockToken(input, index) ||
+      this.getReservedWordToken(input, index, previousToken) ||
+      this.getWordToken(input, index) ||
+      this.getOperatorToken(input, index)
     )
   }
 
-  private getWhitespaceToken(input: string): Token | undefined {
+  private getWhitespaceToken(input: string, index: number): Token | undefined {
     return this.getTokenOnFirstMatch({
       input,
+      index,
       type: tokenTypes.WHITESPACE,
       regex: this.WHITESPACE_REGEX,
     })
   }
 
-  private getCommentToken(input: string): Token | undefined {
-    return this.getLineCommentToken(input) || this.getBlockCommentToken(input)
+  private getCommentToken(input: string, index: number): Token | undefined {
+    return (
+      this.getLineCommentToken(input, index) ||
+      this.getBlockCommentToken(input, index)
+    )
   }
 
-  private getLineCommentToken(input: string): Token | undefined {
+  private getLineCommentToken(input: string, index: number): Token | undefined {
     return this.getTokenOnFirstMatch({
       input,
+      index,
       type: tokenTypes.LINE_COMMENT,
       regex: this.LINE_COMMENT_REGEX,
     })
   }
 
-  private getBlockCommentToken(input: string): Token | undefined {
+  private getBlockCommentToken(
+    input: string,
+    index: number,
+  ): Token | undefined {
     return this.getTokenOnFirstMatch({
       input,
+      index,
       type: tokenTypes.BLOCK_COMMENT,
       regex: this.BLOCK_COMMENT_REGEX,
     })
   }
 
-  private getStringToken(input: string): Token | undefined {
+  private getStringToken(input: string, index: number): Token | undefined {
     return this.getTokenOnFirstMatch({
       input,
+      index,
       type: tokenTypes.STRING,
       regex: this.STRING_REGEX,
     })
   }
 
-  private getOpenParenToken(input: string): Token | undefined {
+  private getOpenParenToken(input: string, index: number): Token | undefined {
     return this.getTokenOnFirstMatch({
       input,
+      index,
       type: tokenTypes.OPEN_PAREN,
       regex: this.OPEN_PAREN_REGEX,
     })
   }
 
-  private getCloseParenToken(input: string): Token | undefined {
+  private getCloseParenToken(input: string, index: number): Token | undefined {
     return this.getTokenOnFirstMatch({
       input,
+      index,
       type: tokenTypes.CLOSE_PAREN,
       regex: this.CLOSE_PAREN_REGEX,
     })
   }
 
-  private getPlaceholderToken(input: string): Token | undefined {
+  private getAssignmentToken(input: string, index: number): Token | undefined {
+    return this.getTokenOnFirstMatch({
+      input,
+      index,
+      type: tokenTypes.OPERATOR,
+      regex: this.ASSIGNMENT_REGEX,
+    })
+  }
+
+  private getPlaceholderToken(input: string, index: number): Token | undefined {
     return (
-      this.getIdentNamedPlaceholderToken(input) ||
-      this.getStringNamedPlaceholderToken(input) ||
-      this.getIndexedPlaceholderToken(input)
+      this.getIdentNamedPlaceholderToken(input, index) ||
+      this.getStringNamedPlaceholderToken(input, index) ||
+      this.getIndexedPlaceholderToken(input, index)
     )
   }
 
-  private getIdentNamedPlaceholderToken(input: string): Token | undefined {
+  private getIdentNamedPlaceholderToken(
+    input: string,
+    index: number,
+  ): Token | undefined {
     return this.getPlaceholderTokenWithKey({
       input,
+      index,
       regex: this.IDENT_NAMED_PLACEHOLDER_REGEX,
       parseKey: (value) => value.slice(1),
     })
   }
 
-  private getStringNamedPlaceholderToken(input: string): Token | undefined {
+  private getStringNamedPlaceholderToken(
+    input: string,
+    index: number,
+  ): Token | undefined {
     return this.getPlaceholderTokenWithKey({
       input,
+      index,
       regex: this.STRING_NAMED_PLACEHOLDER_REGEX,
       parseKey: (value) =>
         this.getEscapedPlaceholderKey({
@@ -258,9 +324,13 @@ export default class Tokenizer {
     })
   }
 
-  private getIndexedPlaceholderToken(input: string): Token | undefined {
+  private getIndexedPlaceholderToken(
+    input: string,
+    index: number,
+  ): Token | undefined {
     return this.getPlaceholderTokenWithKey({
       input,
+      index,
       regex: this.INDEXED_PLACEHOLDER_REGEX,
       parseKey: (value) => value.slice(1),
     })
@@ -268,15 +338,18 @@ export default class Tokenizer {
 
   private getPlaceholderTokenWithKey({
     input,
+    index,
     regex,
     parseKey,
   }: {
     input: string
+    index: number
     regex: PlaceholderRegex
     parseKey: (value: string) => string
   }): Token | undefined {
     const token = this.getTokenOnFirstMatch({
       input,
+      index,
       regex,
       type: tokenTypes.PLACEHOLDER,
     })
@@ -299,63 +372,125 @@ export default class Tokenizer {
     )
   }
 
-  private getNumberToken(input: string): Token | undefined {
+  private getNumberToken(
+    input: string,
+    index: number,
+    previousToken?: Token,
+  ): Token | undefined {
+    const signedNumber = this.canReadSignedNumber(previousToken)
+      ? this.getTokenOnFirstMatch({
+          input,
+          index,
+          type: tokenTypes.NUMBER,
+          regex: this.SIGNED_NUMBER_REGEX,
+        })
+      : undefined
+
+    if (signedNumber) {
+      return signedNumber
+    }
+
     return this.getTokenOnFirstMatch({
       input,
+      index,
       type: tokenTypes.NUMBER,
       regex: this.NUMBER_REGEX,
     })
   }
 
-  private getOperatorToken(input: string): Token {
+  private canReadSignedNumber(previousToken?: Token): boolean {
+    return (
+      !previousToken ||
+      previousToken.type === tokenTypes.OPERATOR ||
+      previousToken.type === tokenTypes.OPEN_PAREN ||
+      previousToken.value === ','
+    )
+  }
+
+  private getOperatorToken(input: string, index: number): Token {
     return this.getTokenOnFirstMatch({
       input,
+      index,
       type: tokenTypes.OPERATOR,
       regex: this.OPERATOR_REGEX,
     }) as Token
   }
 
+  private getKeywordBlockToken(
+    input: string,
+    index: number,
+  ): Token | undefined {
+    return (
+      this.getTokenOnFirstMatch({
+        input,
+        index,
+        type: tokenTypes.RESERVED_KEYWORD_BLOCK_END,
+        regex: this.KEYWORD_BLOCK_END_REGEX,
+      }) ||
+      this.getTokenOnFirstMatch({
+        input,
+        index,
+        type: tokenTypes.RESERVED_KEYWORD_BLOCK_START,
+        regex: this.KEYWORD_BLOCK_START_REGEX,
+      })
+    )
+  }
+
   private getReservedWordToken(
     input: string,
+    index: number,
     previousToken?: Token,
   ): Token | undefined {
     if (previousToken?.value === '.') {
       return undefined
     }
     return (
-      this.getToplevelReservedToken(input) ||
-      this.getNewlineReservedToken(input) ||
-      this.getPlainReservedToken(input)
+      this.getToplevelReservedToken(input, index) ||
+      this.getNewlineReservedToken(input, index) ||
+      this.getPlainReservedToken(input, index)
     )
   }
 
-  private getToplevelReservedToken(input: string): Token | undefined {
+  private getToplevelReservedToken(
+    input: string,
+    index: number,
+  ): Token | undefined {
     return this.getTokenOnFirstMatch({
       input,
+      index,
       type: tokenTypes.RESERVED_TOPLEVEL,
       regex: this.RESERVED_TOPLEVEL_REGEX,
     })
   }
 
-  private getNewlineReservedToken(input: string): Token | undefined {
+  private getNewlineReservedToken(
+    input: string,
+    index: number,
+  ): Token | undefined {
     return this.getTokenOnFirstMatch({
       input,
+      index,
       type: tokenTypes.RESERVED_NEWLINE,
       regex: this.RESERVED_NEWLINE_REGEX,
     })
   }
 
-  private getPlainReservedToken(input: string): Token | undefined {
+  private getPlainReservedToken(
+    input: string,
+    index: number,
+  ): Token | undefined {
     return this.getTokenOnFirstMatch({
       input,
+      index,
       type: tokenTypes.RESERVED,
       regex: this.RESERVED_PLAIN_REGEX,
     })
   }
 
-  private getWordToken(input: string): Token | undefined {
+  private getWordToken(input: string, index: number): Token | undefined {
     return this.getTokenOnFirstMatch({
       input,
+      index,
       type: tokenTypes.WORD,
       regex: this.WORD_REGEX,
     })
@@ -363,10 +498,12 @@ export default class Tokenizer {
 
   private getTokenOnFirstMatch({
     input,
+    index,
     type,
     regex,
   }: {
     input: string
+    index: number
     type: TokenType
     regex: RegExp | false
   }): Token | undefined {
@@ -374,9 +511,10 @@ export default class Tokenizer {
       return undefined
     }
 
-    const matches = input.match(regex)
+    regex.lastIndex = index
+    const matches = regex.exec(input)
 
-    if (matches) {
+    if (matches && matches.index === index) {
       return { type, value: matches[1] }
     }
     return undefined
