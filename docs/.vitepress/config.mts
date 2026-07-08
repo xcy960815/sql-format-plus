@@ -18,7 +18,7 @@ export default defineConfig({
           { text: 'Demo', link: '/guide/demo' },
           {
             text: 'GitHub',
-            link: 'https://github.com/xcy960815/sql-formatter-plus',
+            link: 'https://github.com/xcy960815/sql-format-plus',
           },
         ],
         sidebar: [
@@ -34,7 +34,7 @@ export default defineConfig({
         socialLinks: [
           {
             icon: 'github',
-            link: 'https://github.com/xcy960815/sql-formatter-plus',
+            link: 'https://github.com/xcy960815/sql-format-plus',
           },
         ],
         footer: {
@@ -65,7 +65,7 @@ export default defineConfig({
           { text: '演示', link: '/zh-CN/guide/demo' },
           {
             text: 'GitHub',
-            link: 'https://github.com/xcy960815/sql-formatter-plus',
+            link: 'https://github.com/xcy960815/sql-format-plus',
           },
         ],
         sidebar: [
@@ -81,7 +81,7 @@ export default defineConfig({
         socialLinks: [
           {
             icon: 'github',
-            link: 'https://github.com/xcy960815/sql-formatter-plus',
+            link: 'https://github.com/xcy960815/sql-format-plus',
           },
         ],
         footer: {
