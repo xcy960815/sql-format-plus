@@ -1,6 +1,6 @@
 {
   "name": "sql-format-plus",
-  "version": "2.3.1",
+  "version": "0.0.1",
   "description": "Formats whitespaces in a SQL query to make it more readable.",
   "main": "dist/sql-format-plus.umd.js",
   "module": "dist/sql-format-plus.es.js",
