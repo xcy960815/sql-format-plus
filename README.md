@@ -122,8 +122,12 @@ Source maps are intentionally not published.
 pnpm install
 pnpm run dev
 pnpm run check
+pnpm run test
+pnpm run lint
 pnpm run build
 ```
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for the complete development workflow, dialect-specific test locations, and contribution guidelines.
 
 ## Project Structure
 

@@ -122,8 +122,12 @@ format('SELECT * FROM tbl WHERE foo = ?', {
 pnpm install
 pnpm run dev
 pnpm run check
+pnpm run test
+pnpm run lint
 pnpm run build
 ```
+
+完整的本地开发流程、各 SQL 方言对应的测试文件和贡献说明请查看 [CONTRIBUTING.md](./CONTRIBUTING.md)。
 
 ## 项目结构
 

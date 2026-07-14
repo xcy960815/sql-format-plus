@@ -1,0 +1,77 @@
+name: Bug report
+description: Report incorrect formatting or another reproducible problem
+title: '[Bug]: '
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve sql-format-plus. Please include a minimal reproduction so the formatting difference is easy to verify.
+
+  - type: textarea
+    id: sql-input
+    attributes:
+      label: SQL input
+      description: Paste the smallest SQL query that reproduces the problem.
+      render: sql
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-output
+    attributes:
+      label: Expected output
+      description: Show how you expected sql-format-plus to format the query.
+      render: sql
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-output
+    attributes:
+      label: Actual output
+      description: Show the output produced by sql-format-plus.
+      render: sql
+    validations:
+      required: true
+
+  - type: textarea
+    id: format-options
+    attributes:
+      label: format() options
+      description: Include the language, indent, and params values passed to format(). Use undefined for values you did not provide.
+      placeholder: |
+        {
+          language: 'sql',
+          indent: '  ',
+          params: undefined,
+        }
+      render: ts
+    validations:
+      required: true
+
+  - type: input
+    id: package-version
+    attributes:
+      label: Package version
+      description: Which version of sql-format-plus are you using?
+      placeholder: 0.0.2
+    validations:
+      required: true
+
+  - type: input
+    id: runtime
+    attributes:
+      label: Runtime and operating system
+      description: For example, Node.js 22 on macOS 15 or Chrome 140 on Windows 11.
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add any other details, screenshots, or links that may help investigate the problem.
+    validations:
+      required: false

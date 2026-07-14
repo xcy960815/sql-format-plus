@@ -1,0 +1,66 @@
+name: Feature request
+description: Suggest an improvement or new capability for sql-format-plus
+title: '[Feature]: '
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement. Concrete SQL examples are especially useful for formatter and dialect requests.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: What problem would this feature solve, or what workflow would it improve?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed solution
+      description: Describe the behavior or API you would like to see.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: dialect
+    attributes:
+      label: SQL dialect
+      description: Select the dialect most closely related to this request.
+      options:
+        - Standard SQL (sql)
+        - Couchbase N1QL (n1ql)
+        - IBM DB2 (db2)
+        - Oracle PL/SQL (pl/sql)
+        - All dialects / shared behavior
+        - Not dialect-specific
+    validations:
+      required: true
+
+  - type: textarea
+    id: example
+    attributes:
+      label: Example SQL and desired output
+      description: If applicable, include input SQL and the formatting you expect.
+      render: sql
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Describe any workarounds or alternative designs you have considered.
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add any other details, examples, or links that support the request.
+    validations:
+      required: false
