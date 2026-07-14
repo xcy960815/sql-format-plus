@@ -4,6 +4,9 @@
 [![npm downloads](https://img.shields.io/npm/dw/sql-format-plus.svg)](https://www.npmjs.com/package/sql-format-plus)
 [![CI](https://github.com/xcy960815/sql-format-plus/actions/workflows/ci.yml/badge.svg)](https://github.com/xcy960815/sql-format-plus/actions/workflows/ci.yml)
 [![license](https://img.shields.io/npm/l/sql-format-plus.svg)](./LICENSE)
+[![GitHub issues](https://img.shields.io/github/issues/xcy960815/sql-format-plus.svg)](https://github.com/xcy960815/sql-format-plus/issues)
+[![GitHub stars](https://img.shields.io/github/stars/xcy960815/sql-format-plus.svg?style=social&label=Stars)](https://github.com/xcy960815/sql-format-plus)
+[![GitHub forks](https://img.shields.io/github/forks/xcy960815/sql-format-plus.svg?style=social&label=Fork)](https://github.com/xcy960815/sql-format-plus)
 
 [中文文档](./README.zh-CN.md)
 
