@@ -31,6 +31,11 @@ module.exports = [
         exports: 'named',
       },
       {
+        file: path.join(distDir, 'sql-format-plus.cjs'),
+        format: 'cjs',
+        exports: 'named',
+      },
+      {
         file: path.join(distDir, 'sql-format-plus.umd.min.js'),
         format: 'umd',
         name: 'SqlFormatPlus',

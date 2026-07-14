@@ -17,8 +17,13 @@
     ".": {
       "types": "./types/sql-format-plus.d.ts",
       "import": "./dist/sql-format-plus.es.js",
+      "require": "./dist/sql-format-plus.cjs",
       "default": "./dist/sql-format-plus.es.js"
     }
+  },
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
   },
   "scripts": {
     "dev": "vite",

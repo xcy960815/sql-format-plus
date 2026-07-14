@@ -109,11 +109,12 @@ format('SELECT * FROM tbl WHERE foo = ?', {
 发布包包含：
 
 - `dist/sql-format-plus.es.js`：给现代 bundler 使用的 ESM 版本
+- `dist/sql-format-plus.cjs`：给 `require()` 使用的 CommonJS 版本
 - `dist/sql-format-plus.umd.js`：给 script 标签或传统接入方式使用的 UMD 版本
 - `dist/sql-format-plus.umd.min.js`：压缩后的 UMD 版本
 - `types/sql-format-plus.d.ts`：打包后的 TypeScript 类型声明
 
-源码映射文件和 CommonJS 构建产物不会进入最终发布包。
+源码映射文件不会进入最终发布包。
 
 ## 本地开发
 

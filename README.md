@@ -109,11 +109,12 @@ format('SELECT * FROM tbl WHERE foo = ?', {
 The published package includes:
 
 - `dist/sql-format-plus.es.js`: ESM build for modern bundlers
+- `dist/sql-format-plus.cjs`: CommonJS build for `require()`
 - `dist/sql-format-plus.umd.js`: UMD build for script-tag or legacy integration
 - `dist/sql-format-plus.umd.min.js`: minified UMD build
 - `types/sql-format-plus.d.ts`: bundled TypeScript declarations
 
-Source maps and CommonJS output are intentionally not published.
+Source maps are intentionally not published.
 
 ## Development
 
