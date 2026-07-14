@@ -1,5 +1,10 @@
 # sql-format-plus
 
+[![npm version](https://img.shields.io/npm/v/sql-format-plus.svg)](https://www.npmjs.com/package/sql-format-plus)
+[![npm downloads](https://img.shields.io/npm/dw/sql-format-plus.svg)](https://www.npmjs.com/package/sql-format-plus)
+[![CI](https://github.com/xcy960815/sql-format-plus/actions/workflows/ci.yml/badge.svg)](https://github.com/xcy960815/sql-format-plus/actions/workflows/ci.yml)
+[![license](https://img.shields.io/npm/l/sql-format-plus.svg)](./LICENSE)
+
 [English README](./README.md)
 
 - 文档地址：[https://xcy960815.github.io/sql-format-plus/](https://xcy960815.github.io/sql-format-plus/)
