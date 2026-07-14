@@ -10,5 +10,14 @@
 }
 
 .demo-doc-block {
-  margin-top: 24px;
+  width: min(1120px, calc(100vw - 48px));
+  margin-top: 28px;
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
+
+@media (max-width: 640px) {
+  .demo-doc-block {
+    width: calc(100vw - 28px);
+  }
 }

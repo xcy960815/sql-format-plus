@@ -3,196 +3,242 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SQL Format Plus</title>
-    <style>
-      :root {
-        color: #1d2433;
-        background: #f6f8fb;
-        font-family:
-          Inter,
-          ui-sans-serif,
-          system-ui,
-          -apple-system,
-          BlinkMacSystemFont,
-          'Segoe UI',
-          sans-serif;
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      body {
-        min-height: 100vh;
-        margin: 0;
-      }
-
-      main {
-        display: grid;
-        grid-template-rows: auto 1fr;
-        min-height: 100vh;
-      }
-
-      header {
-        display: flex;
-        gap: 16px;
-        align-items: center;
-        justify-content: space-between;
-        padding: 18px 24px;
-        border-bottom: 1px solid #d9e0ea;
-        background: #ffffff;
-      }
-
-      h1 {
-        margin: 0;
-        font-size: 22px;
-        line-height: 1.2;
-      }
-
-      .controls {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-      }
-
-      label {
-        display: grid;
-        gap: 4px;
-        color: #526070;
-        font-size: 12px;
-      }
-
-      select {
-        min-width: 132px;
-        padding: 8px 10px;
-        border: 1px solid #c8d1dd;
-        border-radius: 6px;
-        background: #ffffff;
-        color: #1d2433;
-      }
-
-      #sql-example {
-        min-width: 220px;
-      }
-
-      .workspace {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-        min-height: 0;
-      }
-
-      .pane {
-        display: grid;
-        grid-template-rows: auto 1fr;
-        min-width: 0;
-        min-height: 0;
-      }
-
-      .pane-title {
-        padding: 10px 20px;
-        border-bottom: 1px solid #d9e0ea;
-        background: #edf2f7;
-        color: #526070;
-        font-size: 12px;
-        font-weight: 700;
-        text-transform: uppercase;
-      }
-
-      textarea,
-      pre {
-        width: 100%;
-        height: 100%;
-        min-height: 420px;
-        margin: 0;
-        padding: 20px;
-        border: 0;
-        outline: 0;
-        overflow: auto;
-        font:
-          14px/1.55 'SFMono-Regular',
-          Consolas,
-          'Liberation Mono',
-          monospace;
-      }
-
-      textarea {
-        resize: none;
-        background: #ffffff;
-      }
-
-      .pane:first-child {
-        border-right: 1px solid #d9e0ea;
-      }
-
-      pre {
-        white-space: pre;
-        background: #101828;
-        color: #e7edf7;
-      }
-
-      @media (max-width: 760px) {
-        header {
-          align-items: flex-start;
-          flex-direction: column;
-        }
-
-        .workspace {
-          grid-template-columns: 1fr;
-        }
-
-        .pane:first-child {
-          border-right: 0;
-          border-bottom: 1px solid #d9e0ea;
-        }
-      }
-    </style>
+    <meta
+      name="description"
+      content="Format SQL, N1QL, DB2, and PL/SQL instantly in your browser."
+    />
+    <meta name="theme-color" content="#0a0d12" />
+    <title>Playground · SQL Format Plus</title>
   </head>
   <body>
-    <main>
-      <header>
-        <h1>SQL Format Plus</h1>
-        <div class="controls">
-          <label>
-            Example
-            <select id="sql-example">
-              <option value="0">Basic filtering</option>
-              <option value="1">JOIN with aggregation</option>
-              <option value="2">CTE and window function</option>
-              <option value="3">N1QL nested data</option>
-              <option value="4">DB2 pagination</option>
-              <option value="5">PL/SQL block</option>
+    <div class="site-shell">
+      <header class="site-header">
+        <a class="brand" href="./" aria-label="SQL Format Plus home">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <ellipse cx="12" cy="6" rx="7" ry="3" />
+              <path d="M5 6v6c0 1.66 3.13 3 7 3s7-1.34 7-3V6" />
+              <path d="M5 12v6c0 1.66 3.13 3 7 3s7-1.34 7-3v-6" />
+            </svg>
+          </span>
+          <span class="brand-name"
+            >sql<span>format</span><strong>+</strong></span
+          >
+        </a>
+
+        <nav class="site-nav" aria-label="Project links">
+          <a
+            href="https://xcy960815.github.io/sql-format-plus/"
+            class="nav-link"
+            data-i18n="documentation"
+            >Documentation</a
+          >
+          <label class="locale-switch">
+            <span class="sr-only">Interface language</span>
+            <select id="ui-locale" aria-label="Interface language">
+              <option value="en">EN</option>
+              <option value="zh">中文</option>
             </select>
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="m4 6 4 4 4-4" />
+            </svg>
           </label>
-          <label>
-            Language
-            <select id="sql-language">
-              <option value="sql">SQL</option>
-              <option value="n1ql">N1QL</option>
-              <option value="db2">DB2</option>
-              <option value="pl/sql">PL/SQL</option>
-            </select>
-          </label>
-          <label>
-            Indent
-            <select id="sql-indent">
-              <option value="  ">2 spaces</option>
-              <option value="    ">4 spaces</option>
-              <option value="	">Tab</option>
-            </select>
-          </label>
-        </div>
+          <a
+            href="https://github.com/xcy960815/sql-format-plus"
+            class="github-link"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.87c-2.78.6-3.37-1.18-3.37-1.18-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.35 1.09 2.92.83.09-.65.35-1.09.64-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.57 9.57 0 0 1 12 6.82a9.55 9.55 0 0 1 2.5.34c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.86v2.76c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"
+              />
+            </svg>
+            <span>GitHub</span>
+          </a>
+        </nav>
       </header>
-      <section class="workspace">
-        <section class="pane" aria-label="SQL input">
-          <div class="pane-title">Input</div>
-          <textarea id="sql-input" spellcheck="false"></textarea>
+
+      <main>
+        <section class="hero" aria-labelledby="page-title">
+          <div class="hero-copy">
+            <div class="eyebrow">
+              <span class="eyebrow-dot"></span>
+              <span data-i18n="eyebrow">Open source SQL formatter</span>
+            </div>
+            <h1 id="page-title">
+              <span data-i18n="heroTitle">Untangle your SQL.</span><br /><span
+                data-i18n="heroTitleMuted"
+                >Keep your flow.</span
+              >
+            </h1>
+            <p data-i18n="heroDescription">
+              A fast, focused formatter for SQL, N1QL, DB2, and PL/SQL — running
+              entirely in your browser.
+            </p>
+          </div>
+
+          <div class="install-card" aria-label="Install package">
+            <div>
+              <span class="install-label" data-i18n="installLabel"
+                >Install with npm</span
+              >
+              <code>npm i sql-format-plus</code>
+            </div>
+            <button
+              class="icon-button install-copy"
+              type="button"
+              aria-label="Copy install command"
+            >
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <rect x="8" y="8" width="11" height="11" rx="2" />
+                <path
+                  d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"
+                />
+              </svg>
+            </button>
+          </div>
         </section>
-        <section class="pane" aria-label="Formatted SQL output">
-          <div class="pane-title">Formatted</div>
-          <pre id="sql-output"></pre>
+
+        <section class="playground" aria-label="SQL formatter playground">
+          <div class="playground-toolbar">
+            <div class="window-controls" aria-hidden="true">
+              <span></span><span></span><span></span>
+            </div>
+            <div class="toolbar-title">
+              <span class="live-indicator"></span>
+              <span data-i18n="playground">Playground</span>
+            </div>
+            <div class="toolbar-actions">
+              <label class="select-control">
+                <span data-i18n="example">Example</span>
+                <select id="sql-example" aria-label="Example query"></select>
+                <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="m4 6 4 4 4-4" />
+                </svg>
+              </label>
+              <label class="select-control compact">
+                <span data-i18n="dialect">Dialect</span>
+                <select id="sql-language" aria-label="SQL dialect">
+                  <option value="sql" data-i18n="standardSql">
+                    Standard SQL
+                  </option>
+                  <option value="n1ql">N1QL</option>
+                  <option value="db2">IBM DB2</option>
+                  <option value="pl/sql">Oracle PL/SQL</option>
+                </select>
+                <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="m4 6 4 4 4-4" />
+                </svg>
+              </label>
+              <label class="select-control compact">
+                <span data-i18n="indent">Indent</span>
+                <select id="sql-indent" aria-label="Indentation size">
+                  <option value="  " data-i18n="twoSpaces">2 spaces</option>
+                  <option value="    " data-i18n="fourSpaces">4 spaces</option>
+                  <option value="&#9;" data-i18n="tab">Tab</option>
+                </select>
+                <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="m4 6 4 4 4-4" />
+                </svg>
+              </label>
+            </div>
+          </div>
+
+          <div class="workspace">
+            <section class="editor-pane input-pane" aria-label="SQL input">
+              <div class="pane-header">
+                <div>
+                  <span class="file-icon input-icon" aria-hidden="true"
+                    >IN</span
+                  >
+                  <span data-i18n="query">Query</span>
+                  <span class="file-name">input.sql</span>
+                </div>
+                <button id="clear-input" class="text-button" type="button">
+                  <span data-i18n="clear">Clear</span>
+                </button>
+              </div>
+              <div class="editor-wrap">
+                <div
+                  id="input-lines"
+                  class="line-numbers"
+                  aria-hidden="true"
+                ></div>
+                <textarea
+                  id="sql-input"
+                  aria-label="SQL query to format"
+                  autocomplete="off"
+                  autocapitalize="off"
+                  spellcheck="false"
+                ></textarea>
+              </div>
+              <div class="pane-status">
+                <span id="input-stats">0 lines · 0 chars</span>
+                <span data-i18n="shortcut">⌘ Enter to format</span>
+              </div>
+            </section>
+
+            <section
+              class="editor-pane output-pane"
+              aria-label="Formatted SQL output"
+            >
+              <div class="pane-header">
+                <div>
+                  <span class="file-icon output-icon" aria-hidden="true"
+                    >OUT</span
+                  >
+                  <span data-i18n="formatted">Formatted</span>
+                  <span class="file-name">output.sql</span>
+                </div>
+                <button
+                  id="copy-output"
+                  class="copy-button"
+                  type="button"
+                  disabled
+                >
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <rect x="8" y="8" width="11" height="11" rx="2" />
+                    <path
+                      d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"
+                    />
+                  </svg>
+                  <span data-i18n="copy">Copy</span>
+                </button>
+              </div>
+              <div class="output-wrap">
+                <div
+                  id="output-lines"
+                  class="line-numbers"
+                  aria-hidden="true"
+                ></div>
+                <pre id="sql-output" tabindex="0"><code></code></pre>
+              </div>
+              <div class="pane-status output-status">
+                <span><i></i><span id="format-status">Ready</span></span>
+                <span id="format-time" data-i18n="liveFormatting"
+                  >Live formatting</span
+                >
+              </div>
+            </section>
+          </div>
         </section>
-      </section>
-    </main>
+
+        <footer class="site-footer">
+          <p data-i18n="footerMessage">
+            Made for people who care about readable queries.
+          </p>
+          <div>
+            <span data-i18n="mitLicensed">MIT licensed</span>
+            <span>·</span>
+            <span data-i18n="zeroDependencies">Zero dependencies</span>
+            <span>·</span>
+            <span data-i18n="runsLocally">Runs locally</span>
+          </div>
+        </footer>
+      </main>
+    </div>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
